@@ -1,3 +1,4 @@
+from email import message
 import random
 import requests
 import json
@@ -6,6 +7,7 @@ import main as main
 import os
 import time
 import csv
+import telebot
 
 def symbols_post_text(text :str):
     text_href = text.replace(' ', '_')
@@ -21,17 +23,24 @@ def symbols_post_text(text :str):
 
 
 def vk_parser():
-    offset_rand = random.randint(0, 150)
-    post_rand = random.randint(0, 2)
+
+    with open('data/all_time.text', 'r') as file:
+        all_time = file.read()
+
+    with open('data/sleep.text', 'r') as file:
+        sleep_time = file.read()
 
     with open('data/domain.csv', "r") as file:
         reader = csv.reader(file)
         headers = next(reader)
         domains = list(headers)
-        
-    rand_domain = random.choice(domains)
-    for rand_domain in len(domains):
 
+    
+    for x in range(0, int(all_time) // int(sleep_time)):
+        offset_rand = random.randint(0, 150)
+        post_rand = random.randint(0, 2)
+        rand_domain = random.choice(domains)
+        
         qwe = ''
         text = ''
 
@@ -45,10 +54,10 @@ def vk_parser():
 
         try:
             text = data['response']['items'][post_rand]['text']
+            text_href = symbols_post_text(text)
         except Exception:
-            text = ''
+            text = 'Такой группы нет'
             pass
-        text_href = symbols_post_text(text)
         for it in range(0, len(data['response']['items'][post_rand]['attachments'])):
             try:
                 qwe = data['response']['items'][post_rand]['attachments'][it]['photo']['sizes'][-1]['url']
@@ -63,7 +72,3 @@ def vk_parser():
 
         with open(f"post/{text_href}/post_text.text", "w", encoding="utf-8") as file:
             file.write(text)
-        
-        print(1)
-
-print("Закончили")
