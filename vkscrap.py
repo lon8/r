@@ -9,6 +9,11 @@ import time
 import csv
 import telebot
 
+with open('data/config.json', 'r', encoding='utf-8') as file:
+    config = json.load(file)
+
+bot = telebot.TeleBot(config['API_TOKEN'])
+
 def symbols_post_text(text :str):
     text_href = text.replace(' ', '_')
     for item in range(0, 10):
@@ -70,5 +75,8 @@ def vk_parser():
             with open(f"post/{text_href}/img_post_{it}.jpeg", 'wb') as file:
                 file.write(img_data)
 
-        with open(f"post/{text_href}/post_text.text", "w", encoding="utf-8") as file:
-            file.write(text)
+            with open(f"post/{text_href}/post_text.text", "w", encoding="utf-8") as file:
+                file.write(text)
+
+            bot.send_photo('@lamourdeglamour', img_data, text)
+            time.sleep(5000)
